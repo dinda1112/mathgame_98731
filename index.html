@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Math Quiz Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .question-box {
+            background: #f8f9ff;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 3px solid #667eea;
+        }
+
+        .question {
+            font-size: 3em;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.5em;
+            border: 3px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .feedback {
+            margin-top: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            min-height: 30px;
+            transition: all 0.3s;
+        }
+
+        .correct {
+            color: #10b981;
+            animation: bounce 0.5s;
+        }
+
+        .wrong {
+            color: #ef4444;
+            animation: shake 0.5s;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .start-screen {
+            text-align: center;
+        }
+
+        .start-screen button {
+            font-size: 1.5em;
+            padding: 20px 50px;
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .emoji {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .game-over {
+            text-align: center;
+        }
+
+        .game-over h2 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .final-score {
+            font-size: 3em;
+            color: #764ba2;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .game-over button {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="start-screen">
+            <div class="emoji">🧮</div>
+            <h1>Math Quiz Game</h1>
+            <p class="subtitle">Test your quick math skills!</p>
+            <p style="color: #666; margin: 20px 0;">Answer 10 questions as fast as you can</p>
+            <button onclick="startGame()">Start Game</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden">
+            <h1>🎯 Math Quiz</h1>
+            <p class="subtitle">Solve the problem below</p>
+
+            <div class="game-stats">
+                <div class="stat-box">
+                    <div class="stat-label">Score</div>
+                    <div class="stat-value" id="score">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Question</div>
+                    <div class="stat-value"><span id="current-question">1</span>/10</div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question" id="question">5 + 3 = ?</div>
+                <div class="input-group">
+                    <input type="number" id="answer-input" placeholder="Type your answer" autofocus>
+                </div>
+                <button onclick="checkAnswer()">Submit Answer</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="game-over hidden">
+            <div class="emoji">🎉</div>
+            <h2>Game Over!</h2>
+            <p style="font-size: 1.2em; color: #666;">Your final score:</p>
+            <div class="final-score" id="final-score">0/10</div>
+            <p style="color: #666; margin: 20px 0;" id="performance-message"></p>
+            <button onclick="restartGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let currentQuestion = 1;
+        let correctAnswer = 0;
+        const totalQuestions = 10;
+
+        function startGame() {
+            score = 0;
+            currentQuestion = 1;
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-over-screen').classList.add('hidden');
+            generateQuestion();
+        }
+
+        function generateQuestion() {
+            const num1 = Math.floor(Math.random() * 20) + 1;
+            const num2 = Math.floor(Math.random() * 20) + 1;
+            const operators = ['+', '-', '×'];
+            const operator = operators[Math.floor(Math.random() * operators.length)];
+
+            switch(operator) {
+                case '+':
+                    correctAnswer = num1 + num2;
+                    break;
+                case '-':
+                    correctAnswer = num1 - num2;
+                    break;
+                case '×':
+                    correctAnswer = num1 * num2;
+                    break;
+            }
+
+            document.getElementById('question').textContent = `${num1} ${operator} ${num2} = ?`;
+            document.getElementById('answer-input').value = '';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('answer-input').focus();
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseInt(document.getElementById('answer-input').value);
+            const feedbackElement = document.getElementById('feedback');
+
+            if (isNaN(userAnswer)) {
+                feedbackElement.textContent = 'Please enter a number!';
+                feedbackElement.className = 'feedback wrong';
+                return;
+            }
+
+            if (userAnswer === correctAnswer) {
+                score++;
+                feedbackElement.textContent = '✓ Correct! Great job!';
+                feedbackElement.className = 'feedback correct';
+                document.getElementById('score').textContent = score;
+            } else {
+                feedbackElement.textContent = `✗ Wrong! The answer was ${correctAnswer}`;
+                feedbackElement.className = 'feedback wrong';
+            }
+
+            currentQuestion++;
+
+            if (currentQuestion > totalQuestions) {
+                setTimeout(showGameOver, 1500);
+            } else {
+                document.getElementById('current-question').textContent = currentQuestion;
+                setTimeout(generateQuestion, 1500);
+            }
+        }
+
+        function showGameOver() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.remove('hidden');
+            document.getElementById('final-score').textContent = `${score}/${totalQuestions}`;
+
+            let message = '';
+            const percentage = (score / totalQuestions) * 100;
+
+            if (percentage === 100) {
+                message = '🏆 Perfect! You are a math genius!';
+            } else if (percentage >= 80) {
+                message = '⭐ Excellent work! Keep it up!';
+            } else if (percentage >= 60) {
+                message = '👍 Good job! Practice makes perfect!';
+            } else {
+                message = '💪 Keep practicing! You will improve!';
+            }
+
+            document.getElementById('performance-message').textContent = message;
+        }
+
+        function restartGame() {
+            startGame();
+        }
+
+        // Allow Enter key to submit answer
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && !document.getElementById('game-screen').classList.contains('hidden')) {
+                checkAnswer();
+            }
+        });
+    </script>
+</body>
+</html>
